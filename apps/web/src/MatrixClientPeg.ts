@@ -295,7 +295,11 @@ class MatrixClientPegClass implements IMatrixClientPeg {
         // the react sdk doesn't work without this, so don't allow
         opts.pendingEventOrdering = PendingEventOrdering.Detached;
         opts.lazyLoadMembers = true;
-        opts.clientWellKnownPollPeriod = 2 * 60 * 60; // 2 hours
+        // Polling the user's `<server_name>/.well-known/matrix/client` endpoint can be disabled
+        // via config. Leaving `clientWellKnownPollPeriod` unset stops the SDK from ever fetching it.
+        if (!SdkConfig.get("disable_client_well_known_lookups")) {
+            opts.clientWellKnownPollPeriod = 2 * 60 * 60; // 2 hours
+        }
         opts.threadSupport = true;
         if (SettingsStore.getValue("feature_user_status")) {
             opts.unstableMSC4429SyncUserProfileFields = ["org.matrix.msc4426.status"];

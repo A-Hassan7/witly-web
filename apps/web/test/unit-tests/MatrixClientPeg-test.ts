@@ -11,6 +11,7 @@ import fetchMock from "@fetch-mock/jest";
 
 import { advanceDateAndTime, stubClient } from "../test-utils";
 import { type IMatrixClientPeg, MatrixClientPeg as peg } from "../../src/MatrixClientPeg";
+import SdkConfig from "../../src/SdkConfig";
 
 jest.useFakeTimers();
 
@@ -112,6 +113,31 @@ describe("MatrixClientPeg", () => {
 
             await testPeg.start();
             expect(mockInitRustCrypto).toHaveBeenCalledTimes(1);
+        });
+
+        it("should poll the client well-known by default", async () => {
+            jest.spyOn(testPeg.safeGet(), "initRustCrypto").mockResolvedValue(undefined);
+            const startClient = jest.spyOn(testPeg.safeGet(), "startClient").mockResolvedValue(undefined);
+
+            await testPeg.start();
+
+            const opts = startClient.mock.calls[0][0];
+            expect(opts?.clientWellKnownPollPeriod).toBe(2 * 60 * 60);
+        });
+
+        it("should not poll the client well-known when disabled via config", async () => {
+            const sdkConfigGet = SdkConfig.get;
+            jest.spyOn(SdkConfig, "get").mockImplementation((key?: any, altCaseName?: string): any => {
+                if (key === "disable_client_well_known_lookups") return true;
+                return sdkConfigGet(key, altCaseName);
+            });
+            jest.spyOn(testPeg.safeGet(), "initRustCrypto").mockResolvedValue(undefined);
+            const startClient = jest.spyOn(testPeg.safeGet(), "startClient").mockResolvedValue(undefined);
+
+            await testPeg.start();
+
+            const opts = startClient.mock.calls[0][0];
+            expect(opts?.clientWellKnownPollPeriod).toBeUndefined();
         });
     });
 });

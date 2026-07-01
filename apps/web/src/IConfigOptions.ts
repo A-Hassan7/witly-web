@@ -51,6 +51,15 @@ export interface IConfigOptions {
     disable_login_language_selector?: boolean;
     disable_3pid_login?: boolean;
 
+    /**
+     * If true, the app will not make runtime requests to the user's
+     * `<server_name>/.well-known/matrix/client` endpoint: it skips the post-login client
+     * well-known poll and the MatrixRTC fallback that reads RTC foci from it. This does NOT
+     * affect the `well_known` object returned inline in the `/login` response, which is still
+     * honoured. Defaults to false (the endpoint is polled as normal).
+     */
+    disable_client_well_known_lookups?: boolean;
+
     brand: string;
     branding: {
         welcome_background_url: string | string[]; // chosen at random if array

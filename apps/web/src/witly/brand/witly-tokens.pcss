@@ -1,0 +1,89 @@
+/*
+Copyright 2026 Witly
+SPDX-License-Identifier: AGPL-3.0-only
+Please see LICENSE files in the repository root for full details.
+*/
+
+/*
+ * ────────────────────────────────────────────────────────────────────────────
+ *  WITLY BRAND TOKEN LAYER  —  the single source of visual truth.
+ * ────────────────────────────────────────────────────────────────────────────
+ *
+ *  Every Witly-specific visual (accent, radius, motion, the Witly button) is a
+ *  `--witly-*` CSS custom property defined HERE and NOWHERE ELSE. Witly
+ *  components read these tokens; they never hardcode a brand value. A rebrand
+ *  (new accent, rounder corners, new motion) is a one-file edit.
+ *
+ *  These tokens sit ON TOP OF Compound (`--cpd-*`). We intentionally do NOT
+ *  override any `--cpd-*` variable globally, so vanilla Element surfaces keep
+ *  Element's exact look — only Witly surfaces pick up the Witly accent.
+ *
+ *  Light mode = `:root`. Dark mode = Compound's `.cpd-theme-dark` selector.
+ *  Values below are the agreed STARTING POINT (playful violet, rounder, more
+ *  motion) and are deliberately easy to change later.
+ * ────────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+    /* ── Accent (playful violet) ─────────────────────────────────────────── */
+    --witly-accent: #7a5af8;
+    --witly-accent-hover: #6a46f0;
+    --witly-accent-pressed: #5a37d8;
+    --witly-accent-subtle: rgba(122, 90, 248, 0.12);
+    --witly-accent-subtle-hover: rgba(122, 90, 248, 0.18);
+    --witly-on-accent: #ffffff;
+
+    /* Accent as a gradient for hero/AI moments (Witly button, active states). */
+    --witly-accent-gradient: linear-gradient(135deg, #7a5af8 0%, #a06bff 100%);
+
+    /* ── Wildcard accent (the 🎲 out-of-scope suggestion) ─────────────────── */
+    --witly-wildcard: #ff8a3d;
+    --witly-wildcard-subtle: rgba(255, 138, 61, 0.14);
+
+    /* ── Surfaces (Witly panels/cards layer over Compound canvas) ────────── */
+    --witly-surface: var(--cpd-color-bg-canvas-default);
+    --witly-surface-raised: var(--cpd-color-bg-subtle-secondary);
+    --witly-border: var(--cpd-color-border-interactive-secondary);
+    --witly-text: var(--cpd-color-text-primary);
+    --witly-text-secondary: var(--cpd-color-text-secondary);
+
+    /* ── Corner radius (rounder than stock Element) ──────────────────────── */
+    --witly-radius-sm: 8px;
+    --witly-radius-md: 14px;
+    --witly-radius-lg: 20px;
+    --witly-radius-pill: 999px;
+
+    /* ── Elevation ───────────────────────────────────────────────────────── */
+    --witly-shadow-card: 0 2px 8px rgba(16, 12, 40, 0.08);
+    --witly-shadow-sheet: 0 -8px 32px rgba(16, 12, 40, 0.18);
+    --witly-glow-accent: 0 0 0 4px var(--witly-accent-subtle);
+
+    /* ── Motion (more playful — used by AI surfaces) ─────────────────────── */
+    --witly-motion-fast: 120ms;
+    --witly-motion-base: 220ms;
+    --witly-motion-slow: 360ms;
+    --witly-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --witly-ease-emphasized: cubic-bezier(0.3, 0, 0, 1.2); /* slight overshoot */
+
+    /* ── Z-index scale for Witly overlays (below Element modals ~4000) ───── */
+    --witly-z-carousel: 1200;
+    --witly-z-sheet: 3000;
+    --witly-z-sheet-scrim: 2990;
+}
+
+.cpd-theme-dark {
+    /* Slightly brighter violet reads better on dark canvases. */
+    --witly-accent: #9b7bff;
+    --witly-accent-hover: #a888ff;
+    --witly-accent-pressed: #8a67f5;
+    --witly-accent-subtle: rgba(155, 123, 255, 0.16);
+    --witly-accent-subtle-hover: rgba(155, 123, 255, 0.24);
+    --witly-on-accent: #ffffff;
+    --witly-accent-gradient: linear-gradient(135deg, #9b7bff 0%, #b98cff 100%);
+
+    --witly-wildcard: #ffa05c;
+    --witly-wildcard-subtle: rgba(255, 160, 92, 0.18);
+
+    --witly-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.32);
+    --witly-shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.48);
+}

@@ -144,14 +144,22 @@ export async function loadPlugins(): Promise<void> {
     // and incidentally means we can forget our React imports in JSX files without penalty.
     window.React = React;
 
-    const modules = SdkConfig.get("modules");
-    if (!modules?.length) return;
     const moduleLoader = new ModuleLoader(ModuleApi.instance);
     window.mxModuleLoader = moduleLoader;
-    for (const src of modules) {
-        // We need to instruct webpack to not mangle this import as it is not available at compile time
-        const module = await import(/* webpackIgnore: true */ src);
-        await moduleLoader.load(module);
+
+    // [WITLY SEAM] Load the bundled-in Witly plugin — our fork's additive layer.
+    // Config-provided modules below are runtime URL imports; Witly is compiled
+    // into the app, so we hand its module export straight to the loader.
+    // See ../../../../docs/witly + client/witly-web/PATCHES.md.
+    await moduleLoader.load(await import("../witly"));
+
+    const modules = SdkConfig.get("modules");
+    if (modules?.length) {
+        for (const src of modules) {
+            // We need to instruct webpack to not mangle this import as it is not available at compile time
+            const module = await import(/* webpackIgnore: true */ src);
+            await moduleLoader.load(module);
+        }
     }
     await moduleLoader.start();
 }

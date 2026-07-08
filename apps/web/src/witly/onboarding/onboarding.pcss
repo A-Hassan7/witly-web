@@ -1,0 +1,299 @@
+/*
+Copyright 2026 Witly
+SPDX-License-Identifier: AGPL-3.0-only
+Please see LICENSE files in the repository root for full details.
+*/
+
+/*
+ * Witly onboarding — styles for the sign-up wizard.
+ * Everything here reads `--witly-*` (brand) and `--cpd-*` (Compound) tokens;
+ * no hardcoded brand values. Layout: centered card on a soft violet gradient.
+ */
+
+.witly_Onboarding {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+    /* Soft violet gradient backdrop (accent-subtle → canvas). */
+    background:
+        radial-gradient(120% 80% at 50% 0%, var(--witly-accent-subtle) 0%, transparent 60%),
+        var(--cpd-color-bg-canvas-default);
+}
+
+.witly_Onboarding_card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--cpd-color-bg-canvas-default);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    border-radius: var(--witly-radius-lg);
+    box-shadow: var(--witly-shadow-card);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: witly_card_in var(--witly-motion-base) var(--witly-ease-emphasized);
+}
+
+@keyframes witly_card_in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ── Brand lockup ─────────────────────────────────────────────────────────── */
+
+.witly_Onboarding_brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_Onboarding_spark {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.witly_Onboarding_title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_Onboarding_subtitle {
+    font-size: 0.95rem;
+    text-align: center;
+    margin: 0;
+    color: var(--cpd-color-text-secondary);
+    line-height: 1.5;
+}
+
+/* ── Step dots ────────────────────────────────────────────────────────────── */
+
+.witly_Onboarding_dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.witly_Onboarding_dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--witly-radius-pill);
+    background: var(--cpd-color-border-interactive-secondary);
+    transition: all var(--witly-motion-base) var(--witly-ease-standard);
+}
+
+.witly_Onboarding_dot--active {
+    width: 22px;
+    background: var(--witly-accent);
+}
+
+.witly_Onboarding_dot--done {
+    background: var(--witly-accent-subtle-hover);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.witly_Onboarding_actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.witly_Btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: var(--witly-radius-md);
+    font-size: 0.98rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        transform var(--witly-motion-fast) var(--witly-ease-standard),
+        background var(--witly-motion-fast) var(--witly-ease-standard),
+        box-shadow var(--witly-motion-fast) var(--witly-ease-standard);
+}
+
+.witly_Btn:active {
+    transform: scale(0.98);
+}
+
+.witly_Btn:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.witly_Btn--primary {
+    background: var(--witly-accent-gradient);
+    color: var(--witly-on-accent);
+}
+
+.witly_Btn--primary:not(:disabled):hover {
+    box-shadow: var(--witly-glow-accent);
+}
+
+.witly_Btn--secondary {
+    background: transparent;
+    color: var(--cpd-color-text-primary);
+    border-color: var(--cpd-color-border-interactive-primary);
+}
+
+.witly_Btn--secondary:not(:disabled):hover {
+    background: var(--cpd-color-bg-subtle-secondary);
+}
+
+.witly_Btn--google {
+    background: var(--cpd-color-bg-canvas-default);
+    color: var(--cpd-color-text-primary);
+    border-color: var(--cpd-color-border-interactive-primary);
+}
+
+.witly_Btn--google:not(:disabled):hover {
+    background: var(--cpd-color-bg-subtle-secondary);
+}
+
+.witly_Btn_gicon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+}
+
+/* ── Divider ──────────────────────────────────────────────────────────────── */
+
+.witly_Onboarding_divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    color: var(--cpd-color-text-secondary);
+    font-size: 0.82rem;
+}
+
+.witly_Onboarding_divider::before,
+.witly_Onboarding_divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--cpd-color-border-interactive-secondary);
+}
+
+/* ── Inputs ───────────────────────────────────────────────────────────────── */
+
+.witly_Field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    text-align: left;
+}
+
+.witly_Field_label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--witly-radius-md);
+    border: 1px solid var(--cpd-color-border-interactive-primary);
+    background: var(--cpd-color-bg-canvas-default);
+    color: var(--cpd-color-text-primary);
+    font-size: 0.98rem;
+    transition: border-color var(--witly-motion-fast) var(--witly-ease-standard);
+}
+
+.witly_Input:focus {
+    outline: none;
+    border-color: var(--witly-accent);
+    box-shadow: var(--witly-glow-accent);
+}
+
+/* ── Inline states ────────────────────────────────────────────────────────── */
+
+.witly_Onboarding_error {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--witly-radius-sm);
+    background: var(--cpd-color-bg-critical-subtle);
+    color: var(--cpd-color-text-critical-primary);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.witly_Onboarding_link {
+    background: none;
+    border: none;
+    color: var(--witly-accent);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.witly_Onboarding_link:hover {
+    text-decoration: underline;
+}
+
+/* ── Provisioning wait ────────────────────────────────────────────────────── */
+
+.witly_Provisioning {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+    padding: 12px 0;
+}
+
+.witly_Provisioning_spark {
+    font-size: 3rem;
+    line-height: 1;
+    animation: witly_spark 1.8s var(--witly-ease-standard) infinite;
+}
+
+@keyframes witly_spark {
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.18) rotate(8deg);
+        opacity: 1;
+    }
+}
+
+.witly_Provisioning_status {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cpd-color-text-primary);
+    min-height: 1.4em;
+    transition: opacity var(--witly-motion-base) var(--witly-ease-standard);
+}
+
+.witly_Provisioning_hint {
+    font-size: 0.85rem;
+    color: var(--cpd-color-text-secondary);
+}

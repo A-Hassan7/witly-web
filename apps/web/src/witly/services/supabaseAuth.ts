@@ -38,6 +38,22 @@ export interface SupabaseUser {
     phone?: string | null;
 }
 
+/**
+ * Error thrown by the Supabase auth wrappers, carrying the HTTP status so
+ * callers can distinguish a definitive rejection (e.g. a 400/401 for an
+ * invalid/already-used refresh token — the session is truly dead) from a
+ * transient network/server error that should NOT destroy the session.
+ */
+export class SupabaseAuthError extends Error {
+    public readonly status: number;
+
+    public constructor(message: string, status: number) {
+        super(message);
+        this.name = "SupabaseAuthError";
+        this.status = status;
+    }
+}
+
 function headers(): HeadersInit {
     return {
         "Content-Type": "application/json",
@@ -59,7 +75,7 @@ async function postForSession(path: string, body: Record<string, unknown>): Prom
         body: JSON.stringify(body),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(extractError(data, String(res.status)));
+    if (!res.ok) throw new SupabaseAuthError(extractError(data, String(res.status)), res.status);
     return data as SupabaseSession;
 }
 

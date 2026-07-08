@@ -34,6 +34,7 @@ git checkout witly && git merge develop                        # bring updates i
 | # | Element file | Change | Why | Status |
 |---|---|---|---|---|
 | 1 | `apps/web/src/vector/init.tsx` (`loadPlugins`) | Create the `ModuleLoader` unconditionally and `await moduleLoader.load(await import("../witly"))` before the config-driven module loop. | The new plugin loader only imports modules from runtime config URLs; our Witly plugin is compiled into the app, so it must be handed to the loader directly. Also removes the early `return` when no config modules exist. | active |
+| 2 | `apps/web/src/components/views/rooms/RoomListPanel/RoomListPanel.tsx` | Render `<WitlyConnectCta/>` between `RoomListHeaderView` and `RoomListView`. | The persistent "finish setup — connect a chat app" prompt must sit at the top of the room list, which is reachable even with an empty inbox. Element's empty-state placeholder lives inside the shared `RoomListView` (`@element-hq/web-shared-components`) with no module-API slot, so this is the minimal host. Additive JSX only — the component self-hides once a platform is connected or the user dismisses it. | active |
 
 <!--
 Template for a new seam:
@@ -53,6 +54,10 @@ Additive code that does **not** count as a seam (no upstream conflict risk). Rec
 | Session | `apps/web/src/witly/services/session.ts` | Supabase token holder + refresh. |
 | Supabase auth | `apps/web/src/witly/services/supabaseAuth.ts` | Google + magic link + phone OTP. |
 | AGChat API client | `apps/web/src/witly/services/agchatApi.ts` | Ported from web-client; provisioning, bridges, AI, SSE. |
+| Device-verify skip | `apps/web/src/witly/onboarding/skipDeviceVerification.ts` | Auto-skips Element's post-login `COMPLETE_SECURITY` prompt during onboarding via the **public** `SetupEncryptionStore` API (`.on("update")` + `.skip()`/`.skipConfirm()`). No core edit. Couples to the `Phase` enum + store API — if either moves upstream, fix this one file. Replace with a Witly-branded verification step later. |
+| Login progress trace | `apps/web/src/witly/onboarding/loginProgress.ts` | Diagnostic: subscribes to Element's dispatcher (`OnLoggedIn`/`WillStartClient`/`ClientStarted`/`ClientNotViable`) + client `Sync` event to log each login milestone with `[Witly]` timestamps. The onboarding view stays on the provisioning screen until Element's first sync completes (`onLoggedIn()` only shows the splash from `LOADING`/`SOFT_LOGOUT`, not our custom `LOGIN` view), so this pinpoints a stalled client-start / crypto / first-sync. Read-only; no core edit. |
+| Connect flow (P3) | `apps/web/src/witly/connect/*` | "Connect a chat app" wizard: `ConnectDialog` (state machine picker→preparing→phone→pairing→connected), `connectController.ts` (bridge deploy/ready polling + connected check), dependency-free `PhoneInput`, `WitlyConnectCta` (room-list prompt), `platforms.ts` (WhatsApp live + coming-soon cards), `connect.pcss`. Additive. |
+| Connect launchers (P3) | `apps/web/src/witly/element/registerConnect.tsx` | Adapter for `extras.setSpacePanelItem` (@alpha) + `openDialog` (@public). Space-panel "Connect" button + `openConnectDialog()`. The ONLY place these two hooks are called for connect. |
 
 ## Module API dependency notes
 
@@ -64,6 +69,7 @@ Witly attaches primarily via `@element-hq/element-web-module-api` (the NEW, non-
 - Prefer `@public` hooks: `overwriteAccountAuth`, `client.accountData`, `i18n.register`, `dialog.openDialog`,
   `config`, `navigation`.
 - `@alpha` hooks we use (`composer.insertPlaintextIntoComposer`, `customComponents.registerLoginComponent`,
-  `extras.addRoomHeaderButtonCallback`) MUST each be wrapped behind a thin internal adapter in `src/witly/element/`
-  so an upstream signature change is a single-file fix. Note each such usage as a row in the seams table above if it
-  ever requires a core edit (portals/DOM-mount fallbacks for the carousel + bottom-sheet may).
+  `extras.addRoomHeaderButtonCallback`, `extras.setSpacePanelItem`) MUST each be wrapped behind a thin internal
+  adapter in `src/witly/element/` so an upstream signature change is a single-file fix. Note each such usage as a row
+  in the seams table above if it ever requires a core edit (portals/DOM-mount fallbacks for the carousel +
+  bottom-sheet may).

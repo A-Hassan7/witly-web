@@ -29,6 +29,9 @@ import "./brand/witly-tokens.pcss";
 import { witlyLog } from "./logger";
 import { setWitlyConfig } from "./config";
 import { readWitlyConfigValue, setWitlyApi } from "./element/moduleApi";
+import { registerWitlyOnboarding } from "./element/registerOnboarding";
+import { registerWitlyConnect } from "./element/registerConnect";
+import { witlySession } from "./services/session";
 
 class WitlyModule implements Module {
     /**
@@ -51,6 +54,21 @@ class WitlyModule implements Module {
             supabaseUrl: readWitlyConfigValue("witly.supabase_url"),
             supabaseKey: readWitlyConfigValue("witly.supabase_key"),
         });
+
+        // Restore the persisted Supabase session so an already-signed-in user
+        // keeps their Witly auth. This also RECOVERS the session after Element
+        // wipes localStorage on a hard logout (a dying Matrix token triggers
+        // one): `hydrate()` falls back to the durable IndexedDB backup that
+        // Element never clears. Awaited so `witlySession.isAuthenticated()` is
+        // accurate by the time the onboarding surface mounts and can silently
+        // re-provision Matrix instead of forcing a fresh sign-in.
+        await witlySession.hydrate();
+
+        // P1 — replace Element's login with the Witly onboarding wizard.
+        registerWitlyOnboarding();
+
+        // P3 — add the "connect a chat app" launcher to the space panel.
+        registerWitlyConnect();
 
         witlyLog.info("Witly module loaded");
     }

@@ -99,7 +99,13 @@ async function request<T>(path: string, init: RequestInit = {}, _retried = false
         witlyLog.warn(`401 on ${path} — refreshing token and retrying`);
         try {
             await witlySession.forceRefresh();
-        } catch {
+        } catch (err) {
+            // forceRefresh clears the session only on a definitive rejection; if
+            // it's still authenticated the failure was transient — surface that
+            // rather than telling the user their session expired.
+            if (witlySession.isAuthenticated()) {
+                throw err instanceof Error ? err : new Error("Couldn't reach the server. Please try again.");
+            }
             throw new Error("401: Session expired — please sign in again");
         }
         return request<T>(path, init, true);

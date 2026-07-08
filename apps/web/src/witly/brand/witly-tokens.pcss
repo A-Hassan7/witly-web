@@ -40,12 +40,13 @@ Please see LICENSE files in the repository root for full details.
     --witly-wildcard: #ff8a3d;
     --witly-wildcard-subtle: rgba(255, 138, 61, 0.14);
 
-    /* ── Surfaces (Witly panels/cards layer over Compound canvas) ────────── */
-    --witly-surface: var(--cpd-color-bg-canvas-default);
-    --witly-surface-raised: var(--cpd-color-bg-subtle-secondary);
-    --witly-border: var(--cpd-color-border-interactive-secondary);
-    --witly-text: var(--cpd-color-text-primary);
-    --witly-text-secondary: var(--cpd-color-text-secondary);
+    /* ── Surfaces & text ─────────────────────────────────────────────────
+     * These come DIRECTLY from Compound (`--cpd-color-*`) in components — we
+     * intentionally do NOT alias them here. Compound's theme tokens are scoped
+     * to `body.cpd-theme-light/-dark`; aliasing them on `:root` would pre-
+     * resolve them against the (un-themed) `:root` values and break theming.
+     * Witly surfaces use `--cpd-color-bg-canvas-default`, `--cpd-color-text-*`,
+     * `--cpd-color-border-*` directly so they theme identically to Element. */
 
     /* ── Corner radius (rounder than stock Element) ──────────────────────── */
     --witly-radius-sm: 8px;

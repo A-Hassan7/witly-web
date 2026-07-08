@@ -20,6 +20,9 @@ import { type IState as IRovingTabIndexState } from "../../../../accessibility/R
 import { RoomListHeaderViewModel } from "../../../../viewmodels/room-list/RoomListHeaderViewModel";
 import { useMatrixClientContext } from "../../../../contexts/MatrixClientContext";
 import SpaceStore from "../../../../stores/spaces/SpaceStore";
+// Witly seam (PATCHES.md #2): persistent "connect a chat app" prompt shown
+// above the room list until a platform is connected. Additive only.
+import { WitlyConnectCta } from "../../../../witly/connect/WitlyConnectCta";
 
 type RoomListPanelProps = {
     /**
@@ -78,6 +81,7 @@ export const RoomListPanel: React.FC<RoomListPanelProps> = ({ activeSpace }) => 
         >
             {displayRoomSearch && <RoomListSearch activeSpace={activeSpace} />}
             <RoomListHeaderView vm={vm} />
+            <WitlyConnectCta />
             <RoomListView />
         </Flex>
     );

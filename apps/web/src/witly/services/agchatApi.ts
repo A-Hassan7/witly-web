@@ -309,6 +309,30 @@ export const getAiCatalog = (): Promise<{ prompts: AiCatalogEntry[]; features: s
 
 export const getAiCredits = (): Promise<AiCreditsResponse> => request<AiCreditsResponse>("/ai/credits");
 
+// ── Wit Library ─────────────────────────────────────────────────────────────
+
+/** A canned example reply shown in a Wit card so users hear the persona instantly. */
+export interface WitExample {
+    incoming: string;
+    reply: string;
+}
+
+/** A preset Wit (persona) as returned by GET /wits. */
+export interface WitCatalogEntry {
+    wit_id: string;
+    /** Backing prompt feature, "wits/<wit_id>". Used as the generation feature. */
+    feature: string;
+    name: string;
+    emoji: string;
+    blurb: string;
+    examples: WitExample[];
+    category: string;
+    sort_order: number;
+}
+
+/** Fetch the browseable catalogue of preset Wits for the library. */
+export const getWits = (): Promise<{ wits: WitCatalogEntry[] }> =>
+    request<{ wits: WitCatalogEntry[] }>("/wits");
 /**
  * Send a raw image blob to the backend for AI captioning via the vision model.
  * Returns null on a non-2xx response so callers can fall back gracefully.

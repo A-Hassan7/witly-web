@@ -1,0 +1,274 @@
+/*
+Copyright 2026 Witly
+SPDX-License-Identifier: AGPL-3.0-only
+Please see LICENSE files in the repository root for full details.
+*/
+
+/*
+ * Witly Wit Library — styles for the standalone Wit browser/creator modal
+ * (rendered inside an Element module dialog).
+ *
+ * Reads `--witly-*` (brand) and `--cpd-*` (Compound) tokens only; no hardcoded
+ * brand values. Reuses `.witly_Btn` from onboarding.pcss (always bundled).
+ */
+
+.witly_Wits {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 340px;
+    max-width: 560px;
+    padding: 4px 0 8px;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+
+.witly_Wits_toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.witly_Wits_search {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 14px;
+    border-radius: var(--witly-radius-pill);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    background: var(--cpd-color-bg-canvas-default);
+    color: var(--cpd-color-text-primary);
+    font-size: 0.95rem;
+}
+
+.witly_Wits_search:focus {
+    outline: none;
+    border-color: var(--witly-accent);
+}
+
+.witly_Wits_create {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.witly_Wits_mixNote {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Wits_status {
+    margin: 8px 0;
+    font-size: 0.95rem;
+    color: var(--cpd-color-text-secondary);
+    text-align: center;
+}
+
+.witly_Wits_status--error {
+    color: var(--cpd-color-text-critical-primary);
+}
+
+/* ── Category groups ─────────────────────────────────────────────────────── */
+
+.witly_Wits_group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.witly_Wits_groupTitle {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Wits_grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+/* ── Wit card ────────────────────────────────────────────────────────────── */
+
+.witly_WitCard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    border-radius: var(--witly-radius-md);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    background: var(--cpd-color-bg-canvas-default);
+    box-shadow: var(--witly-shadow-card);
+    transition:
+        border-color var(--witly-motion-fast) var(--witly-ease-standard),
+        box-shadow var(--witly-motion-fast) var(--witly-ease-standard);
+}
+
+.witly_WitCard--inMix {
+    border-color: var(--witly-accent);
+}
+
+.witly_WitCard_head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.witly_WitCard_emoji {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--witly-radius-md);
+    background: var(--witly-accent-subtle);
+    font-size: 1.4rem;
+}
+
+.witly_WitCard_id {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.witly_WitCard_name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_WitCard_blurb {
+    font-size: 0.85rem;
+    line-height: 1.35;
+    color: var(--cpd-color-text-secondary);
+}
+
+/* ── Example bubbles ─────────────────────────────────────────────────────── */
+
+.witly_WitCard_example {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.witly_WitCard_bubble {
+    max-width: 90%;
+    padding: 7px 11px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    border-radius: var(--witly-radius-md);
+}
+
+.witly_WitCard_bubble--in {
+    align-self: flex-start;
+    background: var(--cpd-color-bg-subtle-secondary);
+    color: var(--cpd-color-text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+.witly_WitCard_bubble--out {
+    align-self: flex-end;
+    background: var(--witly-accent);
+    color: var(--cpd-color-text-on-solid-primary);
+    border-bottom-right-radius: 4px;
+}
+
+/* ── Card actions ────────────────────────────────────────────────────────── */
+
+.witly_WitCard_actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.witly_WitCard_toggle {
+    flex: 1;
+    padding: 9px 12px;
+    font-size: 0.9rem;
+}
+
+.witly_WitCard_delete {
+    flex-shrink: 0;
+    padding: 9px 12px;
+    border: none;
+    background: transparent;
+    color: var(--cpd-color-text-critical-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: var(--witly-radius-md);
+}
+
+.witly_WitCard_delete:hover {
+    background: var(--cpd-color-bg-critical-subtle);
+}
+
+/* ── Create form ─────────────────────────────────────────────────────────── */
+
+.witly_WitForm {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 340px;
+    max-width: 480px;
+}
+
+.witly_WitForm_title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_WitForm_hint {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_WitForm_field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.witly_WitForm_label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_WitForm_input {
+    padding: 10px 12px;
+    border-radius: var(--witly-radius-md);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    background: var(--cpd-color-bg-canvas-default);
+    color: var(--cpd-color-text-primary);
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+
+.witly_WitForm_input:focus {
+    outline: none;
+    border-color: var(--witly-accent);
+}
+
+.witly_WitForm_textarea {
+    resize: vertical;
+    min-height: 72px;
+}
+
+.witly_WitForm_actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}

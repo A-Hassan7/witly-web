@@ -31,6 +31,7 @@ import { setWitlyConfig } from "./config";
 import { readWitlyConfigValue, setWitlyApi } from "./element/moduleApi";
 import { registerWitlyOnboarding } from "./element/registerOnboarding";
 import { registerWitlyConnect } from "./element/registerConnect";
+import { registerWitlyWits } from "./element/registerWits";
 import { witlySession } from "./services/session";
 
 class WitlyModule implements Module {
@@ -69,6 +70,9 @@ class WitlyModule implements Module {
 
         // P3 — add the "connect a chat app" launcher to the space panel.
         registerWitlyConnect();
+
+        // Wit Library — add the "Wits" launcher to the space panel.
+        registerWitlyWits();
 
         witlyLog.info("Witly module loaded");
     }

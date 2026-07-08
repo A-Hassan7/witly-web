@@ -292,7 +292,7 @@ function CreateWitForm({ onCancel, onSaved }: CreateWitFormProps): JSX.Element {
                 ? [{ incoming: exampleIn.trim(), reply: exampleReply.trim() }]
                 : undefined;
         const wit: CustomWit = {
-            id: `custom-${Date.now()}`,
+            id: `custom-${crypto.randomUUID()}`,
             name: name.trim(),
             emoji: emoji.trim(),
             prompt: prompt.trim(),

@@ -47,6 +47,7 @@ Please see LICENSE files in the repository root for full details.
 
 .witly_Wits_create {
     flex-shrink: 0;
+    width: auto;
     white-space: nowrap;
 }
 
@@ -271,4 +272,17 @@ Please see LICENSE files in the repository root for full details.
     justify-content: flex-end;
     gap: 10px;
     margin-top: 4px;
+}
+
+.witly_WitForm_actions .witly_Btn {
+    width: auto;
+}
+
+.witly_WitForm_cancel {
+    background: transparent;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_WitForm_cancel:not(:disabled):hover {
+    background: var(--cpd-color-bg-subtle-secondary);
 }

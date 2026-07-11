@@ -1,0 +1,224 @@
+/*
+Copyright 2026 Witly
+SPDX-License-Identifier: AGPL-3.0-only
+Please see LICENSE files in the repository root for full details.
+*/
+
+/*
+ * Witly in-room suggestions (P4) — the above-composer carousel + button and the
+ * overflow panel dialog.
+ *
+ * Reads `--witly-*` (brand) and `--cpd-*` (Compound) tokens only; no hardcoded
+ * brand values, and NEVER aliases `--cpd-*` at :root. Reuses `.witly_Btn` from
+ * onboarding.pcss (always bundled).
+ */
+
+/* ── Above-composer surface ──────────────────────────────────────────────── */
+
+.witly_ComposerSuggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px 8px 2px;
+}
+
+.witly_ComposerSuggestions_carousel {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+}
+
+.witly_ComposerSuggestions_bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.witly_ComposerSuggestions_go {
+    width: auto;
+    white-space: nowrap;
+}
+
+.witly_ComposerSuggestions_more {
+    width: auto;
+    white-space: nowrap;
+    background: transparent;
+    color: var(--cpd-color-text-secondary);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+}
+
+/* ── Suggestion cards ────────────────────────────────────────────────────── */
+
+.witly_SgCard {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: var(--witly-radius-md, 12px);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    background: var(--cpd-color-bg-canvas-default);
+    color: var(--cpd-color-text-primary);
+    font-size: 0.92rem;
+    line-height: 1.35;
+    cursor: pointer;
+}
+
+.witly_SgCard:hover {
+    border-color: var(--witly-accent);
+}
+
+.witly_SgCard--carousel {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    width: auto;
+    min-width: 200px;
+    max-width: 320px;
+    flex-shrink: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.witly_SgCard_body {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.witly_SgCard_tag {
+    flex-shrink: 0;
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.witly_SgCard_text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.witly_SgCard_regen {
+    flex-shrink: 0;
+    width: 34px;
+    border: none;
+    border-left: 1px solid var(--cpd-color-border-interactive-secondary);
+    background: var(--cpd-color-bg-subtle-secondary);
+    color: var(--cpd-color-text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.witly_SgCard_regen:hover {
+    color: var(--witly-accent);
+}
+
+/* The Wildcard card is deliberately distinct from the mix Wits. */
+.witly_SgCard--wildcard {
+    border-color: var(--witly-accent);
+    background: var(--witly-accent-subtle, var(--cpd-color-bg-subtle-primary));
+}
+
+/* ── Credit banners ──────────────────────────────────────────────────────── */
+
+.witly_Sg_banner {
+    padding: 8px 12px;
+    border-radius: var(--witly-radius-md, 12px);
+    font-size: 0.88rem;
+}
+
+.witly_Sg_banner--warn {
+    background: var(--cpd-color-bg-subtle-secondary);
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Sg_banner--error {
+    background: var(--cpd-color-bg-critical-subtle);
+    color: var(--cpd-color-text-critical-primary);
+}
+
+/* ── Overflow panel (dialog) ─────────────────────────────────────────────── */
+
+.witly_Sg_panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 340px;
+    max-width: 560px;
+    padding: 4px 0 8px;
+}
+
+.witly_Sg_empty {
+    margin: 0;
+    color: var(--cpd-color-text-secondary);
+    font-size: 0.92rem;
+}
+
+.witly_SgGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.witly_SgGroup_head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.witly_SgGroup_emoji {
+    font-size: 1.1rem;
+}
+
+.witly_SgGroup_name {
+    font-weight: 600;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_SgGroup_regen {
+    margin-left: auto;
+    width: auto;
+    white-space: nowrap;
+    background: transparent;
+    color: var(--cpd-color-text-secondary);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    font-size: 0.82rem;
+    padding: 4px 10px;
+}
+
+.witly_SgGroup--wildcard .witly_SgGroup_name {
+    color: var(--witly-accent);
+}
+
+.witly_SgGroup_list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.witly_Sg_loading,
+.witly_Sg_error {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Sg_error {
+    color: var(--cpd-color-text-critical-primary);
+}

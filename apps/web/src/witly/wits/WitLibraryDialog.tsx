@@ -23,7 +23,7 @@ import React, { type JSX, useCallback, useEffect, useMemo, useState } from "reac
 import type { DialogProps } from "@element-hq/element-web-module-api";
 
 import { witlyLog } from "../logger";
-import { getWits, type WitCatalogEntry, type WitExample } from "../services/agchatApi";
+import { getWits, getAiCatalog, type WitCatalogEntry, type WitExample } from "../services/agchatApi";
 import { type CustomWit, witStore } from "./witStore";
 import "./wits.pcss";
 
@@ -74,14 +74,26 @@ export function WitLibraryDialog(_props: DialogProps<Record<string, never>>): JS
     // Snapshot of store-derived state; refreshed via subscribe.
     const [customWits, setCustomWits] = useState<CustomWit[]>([]);
     const [mix, setMix] = useState<string[]>([]);
+    const [maxMixSize, setMaxMixSize] = useState<number>(witStore.getMaxMixSize());
+    const [mixError, setMixError] = useState<string | null>(null);
 
     useEffect(() => {
         const sync = (): void => {
             setCustomWits(witStore.getCustomWits());
             setMix(witStore.getMix());
+            setMaxMixSize(witStore.getMaxMixSize());
         };
         sync();
         return witStore.subscribe(sync);
+    }, []);
+
+    // Load the admin-configured mix-size cap from the backend catalog once.
+    useEffect(() => {
+        void getAiCatalog()
+            .then((c) => {
+                if (typeof c.max_wit_mix_size === "number") witStore.setMaxMixSize(c.max_wit_mix_size);
+            })
+            .catch((err) => witlyLog.warn("getAiCatalog (mix cap) failed", err));
     }, []);
 
     useEffect(() => {
@@ -131,10 +143,13 @@ export function WitLibraryDialog(_props: DialogProps<Record<string, never>>): JS
     }, [cards]);
 
     const toggleMix = useCallback(async (witId: string, inMix: boolean) => {
+        setMixError(null);
         try {
             if (inMix) await witStore.removeFromMix(witId);
             else await witStore.addToMix(witId);
         } catch (err) {
+            // addToMix throws when the mix is at the configured cap.
+            setMixError(err instanceof Error ? err.message : "Couldn't update your mix.");
             witlyLog.warn("toggleMix failed", err);
         }
     }, []);
@@ -181,8 +196,9 @@ export function WitLibraryDialog(_props: DialogProps<Record<string, never>>): JS
             <p className="witly_Wits_mixNote">
                 {mix.length === 0
                     ? "Add Wits to your mix to shape your reply suggestions."
-                    : `${mix.length} Wit${mix.length === 1 ? "" : "s"} in your mix.`}
+                    : `${mix.length} of ${maxMixSize} Wit${maxMixSize === 1 ? "" : "s"} in your mix.`}
             </p>
+            {mixError && <p className="witly_Wits_status witly_Wits_status--error">{mixError}</p>}
 
             {loading && <p className="witly_Wits_status">Loading Wits…</p>}
             {loadError && !loading && <p className="witly_Wits_status witly_Wits_status--error">{loadError}</p>}

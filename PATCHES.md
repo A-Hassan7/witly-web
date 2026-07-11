@@ -35,6 +35,7 @@ git checkout witly && git merge develop                        # bring updates i
 |---|---|---|---|---|
 | 1 | `apps/web/src/vector/init.tsx` (`loadPlugins`) | Create the `ModuleLoader` unconditionally and `await moduleLoader.load(await import("../witly"))` before the config-driven module loop. | The new plugin loader only imports modules from runtime config URLs; our Witly plugin is compiled into the app, so it must be handed to the loader directly. Also removes the early `return` when no config modules exist. | active |
 | 2 | `apps/web/src/components/views/rooms/RoomListPanel/RoomListPanel.tsx` | Render `<WitlyConnectCta/>` between `RoomListHeaderView` and `RoomListView`. | The persistent "finish setup — connect a chat app" prompt must sit at the top of the room list, which is reachable even with an empty inbox. Element's empty-state placeholder lives inside the shared `RoomListView` (`@element-hq/web-shared-components`) with no module-API slot, so this is the minimal host. Additive JSX only — the component self-hides once a platform is connected or the user dismisses it. | active |
+| 3 | `apps/web/src/components/views/rooms/MessageComposer.tsx` (`render`) | One additive import + render `<WitlyComposerSlot roomId={this.props.room.roomId} />` inside `.mx_MessageComposer_wrapper`, immediately after `<ReplyPreview/>` and before `.mx_MessageComposer_row`. | The in-room suggestion carousel + ✨ button must sit directly above the composer input. No module-API hook reaches the composer content area (`composer.insertPlaintextIntoComposer` only *inserts text*, it cannot mount UI there). Both seam lines are marked `WITLY SEAM`. The slot self-guards (auth + module-ready) and is error-bounded inside the Witly layer, so it renders null in vanilla Element. | active |
 
 <!--
 Template for a new seam:
@@ -58,6 +59,17 @@ Additive code that does **not** count as a seam (no upstream conflict risk). Rec
 | Login progress trace | `apps/web/src/witly/onboarding/loginProgress.ts` | Diagnostic: subscribes to Element's dispatcher (`OnLoggedIn`/`WillStartClient`/`ClientStarted`/`ClientNotViable`) + client `Sync` event to log each login milestone with `[Witly]` timestamps. The onboarding view stays on the provisioning screen until Element's first sync completes (`onLoggedIn()` only shows the splash from `LOADING`/`SOFT_LOGOUT`, not our custom `LOGIN` view), so this pinpoints a stalled client-start / crypto / first-sync. Read-only; no core edit. |
 | Connect flow (P3) | `apps/web/src/witly/connect/*` | "Connect a chat app" wizard: `ConnectDialog` (state machine picker→preparing→phone→pairing→connected), `connectController.ts` (bridge deploy/ready polling + connected check), dependency-free `PhoneInput`, `WitlyConnectCta` (room-list prompt), `platforms.ts` (WhatsApp live + coming-soon cards), `connect.pcss`. Additive. |
 | Connect launchers (P3) | `apps/web/src/witly/element/registerConnect.tsx` | Adapter for `extras.setSpacePanelItem` (@alpha) + `openDialog` (@public). Space-panel "Connect" button + `openConnectDialog()`. The ONLY place these two hooks are called for connect. |
+| In-room suggestions (P4) | `apps/web/src/witly/suggestions/*` | `types.ts` (source/engine state), `suggestionStore.ts` (per-room `RoomEngine`: resolves the effective Wit mix → parallel `postSuggestions`+SSE fan-out, Wildcard mix-aware source, 402/near-limit detection), `timing.ts` (Manual + Smart 5s debounce), `useRoomSuggestions.ts` (hook), `WitlyComposerSlot.tsx` (defensive seam entry: auth/ready guard + error boundary), `WitlyComposerSuggestions.tsx` (above-composer carousel + button), `SuggestionsPanel.tsx` (overflow dialog), `suggestions.pcss`. Additive; mounted via seam #3. |
+| Suggestions panel launcher (P4) | `apps/web/src/witly/element/registerSuggestions.tsx` | Adapter for `openDialog` (@public) — `openSuggestionsPanel(roomId)`. The ONLY place this hook is called for the suggestions panel. |
+| Composer insert adapter (P4) | `apps/web/src/witly/element/moduleApi.ts` (`insertSuggestionIntoComposer`) | Thin wrapper over the `@alpha` `composer.insertPlaintextIntoComposer`; returns false on failure. Single-file fix if the hook signature moves. |
+
+### Direct-internal-import seams (matrix-js-sdk)
+
+Witly avoids importing Element/matrix-js-sdk internals. The one exception is **read-only** timeline access, which the module API does not expose:
+
+| File | Imports | Contract |
+|---|---|---|
+| `apps/web/src/witly/element/roomTimeline.ts` | `MatrixClientPeg` + `matrix-js-sdk/src/matrix` types/events | **READ-ONLY.** The ONLY Witly file allowed to touch the raw client/timeline. Exposes `getRecentMessages`, `lastMessageIsInbound`, `subscribeToRoom`. Never sends, edits, or mutates Matrix state. If matrix-js-sdk internals move, this one file is the fix. |
 
 ## Module API dependency notes
 

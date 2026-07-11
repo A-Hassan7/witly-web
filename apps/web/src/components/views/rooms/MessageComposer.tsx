@@ -54,6 +54,9 @@ import { type MatrixClientProps, withMatrixClientHOC } from "../../../contexts/M
 import { UIFeature } from "../../../settings/UIFeature";
 import { formatTimeLeft } from "../../../DateUtils";
 import RoomReplacedSvg from "../../../../res/img/room_replaced.svg";
+// WITLY SEAM (PATCHES.md #3): mount the above-composer suggestion surface.
+// Additive import of one Witly component; no Element logic changed.
+import { WitlyComposerSlot } from "../../../witly/suggestions/WitlyComposerSlot";
 
 // The prefix used when persisting editor drafts to localstorage.
 export const WYSIWYG_EDITOR_STATE_STORAGE_PREFIX = "mx_wysiwyg_state_";
@@ -679,6 +682,10 @@ export class MessageComposer extends React.Component<IProps, IState> {
                         replyToEvent={this.props.replyToEvent}
                         permalinkCreator={this.props.permalinkCreator}
                     />
+                    {/* WITLY SEAM (PATCHES.md #3): above-composer suggestion carousel + button.
+                        Self-guards (auth/ready) and error-bounded inside the Witly layer, so this
+                        renders null in vanilla Element. Additive only. */}
+                    <WitlyComposerSlot roomId={this.props.room.roomId} />
                     <div className="mx_MessageComposer_row">
                         {leftIcon}
                         {composer}

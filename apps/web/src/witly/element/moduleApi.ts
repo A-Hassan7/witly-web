@@ -58,3 +58,28 @@ export function readWitlyConfigValue(key: string): string | undefined {
         return undefined;
     }
 }
+
+/**
+ * Insert a suggestion into the active room composer as an EDITABLE draft.
+ *
+ * P4 seam. Wraps the `@alpha` `composer.insertPlaintextIntoComposer` hook so an
+ * upstream signature change is a single-file fix (stability discipline, see
+ * PATCHES.md). Text-only and non-destructive: it inserts at the cursor and
+ * NEVER sends — the user always reviews/edits before hitting send.
+ *
+ * Returns false (and warns) if the API isn't ready or the hook throws, so the
+ * caller can surface a soft failure instead of crashing the composer.
+ */
+export function insertSuggestionIntoComposer(text: string, view: "room" | "thread" = "room"): boolean {
+    if (!api) {
+        witlyLog.warn("insertSuggestionIntoComposer called before module load");
+        return false;
+    }
+    try {
+        api.composer.insertPlaintextIntoComposer(text, { view });
+        return true;
+    } catch (err) {
+        witlyLog.warn("insertSuggestionIntoComposer failed", err);
+        return false;
+    }
+}

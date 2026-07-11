@@ -15,8 +15,11 @@ Please see LICENSE files in the repository root for full details.
  *
  *   witly.wit_mix      → { order: string[] }               // active wit_ids, ordered
  *   witly.custom_wits  → { wits: CustomWit[] }              // user-defined personas
+ *   witly.room_settings→ { rooms: { [roomId]: RoomOverride } } // per-chat overrides
  *
- * The mix is global for v1 (per-room overrides are a later addition).
+ * The mix is global by default; a room may override the active mix and/or the
+ * suggestion-timing mode (P4). Per-room overrides layer on top of the global
+ * mix — a room with no override inherits the global one.
  *
  * All homeserver access is funnelled through the module API (`api.client
  * .accountData`) so the Witly layer never reaches into Element internals
@@ -28,6 +31,24 @@ import { witlyLog } from "../logger";
 
 export const WIT_MIX_EVENT_TYPE = "witly.wit_mix";
 export const CUSTOM_WITS_EVENT_TYPE = "witly.custom_wits";
+export const ROOM_SETTINGS_EVENT_TYPE = "witly.room_settings";
+
+/** Suggestion-timing mode. Manual = button only; Smart = auto ~5s after inbound. */
+export type TimingMode = "manual" | "smart";
+
+/** The global default timing mode when a room has no override. */
+export const DEFAULT_TIMING_MODE: TimingMode = "manual";
+
+/** Fallback mix-size cap used until the backend catalog value is loaded. */
+export const DEFAULT_MAX_MIX_SIZE = 8;
+
+/** Per-room override of the global mix and/or timing. Absent fields inherit. */
+export interface RoomOverride {
+    /** Ordered wit_ids active in this room. If unset, the global mix applies. */
+    mix?: string[];
+    /** Timing mode for this room. If unset, the global default applies. */
+    timing?: TimingMode;
+}
 
 /** A user-defined custom Wit. Stored on the client (account data) for now. */
 export interface CustomWit {
@@ -49,10 +70,27 @@ interface CustomWitsContent {
     wits?: CustomWit[];
 }
 
+interface RoomSettingsContent {
+    rooms?: Record<string, RoomOverride>;
+}
+
 type Listener = () => void;
 
 function isStringArray(value: unknown): value is string[] {
     return Array.isArray(value) && value.every((v) => typeof v === "string");
+}
+
+function isTimingMode(value: unknown): value is TimingMode {
+    return value === "manual" || value === "smart";
+}
+
+function sanitizeRoomOverride(value: unknown): RoomOverride | null {
+    if (typeof value !== "object" || value === null) return null;
+    const v = value as Record<string, unknown>;
+    const override: RoomOverride = {};
+    if (isStringArray(v.mix)) override.mix = v.mix;
+    if (isTimingMode(v.timing)) override.timing = v.timing;
+    return Object.keys(override).length ? override : null;
 }
 
 function sanitizeCustomWit(value: unknown): CustomWit | null {
@@ -87,33 +125,55 @@ function sanitizeCustomWit(value: unknown): CustomWit | null {
 class WitStore {
     private mixOrder: string[] = [];
     private customWits: CustomWit[] = [];
+    private roomSettings: Record<string, RoomOverride> = {};
+    private maxMixSize = DEFAULT_MAX_MIX_SIZE;
+    private globalTiming: TimingMode = DEFAULT_TIMING_MODE;
     private hydrated = false;
     private readonly listeners = new Set<Listener>();
-    private watching = false;
 
-    /** Read initial state from account data and start watching for remote changes. */
+    /**
+     * Read initial state from account data and start watching for remote changes.
+     *
+     * `hydrate()` can be called before the Matrix client exists — it is warmed
+     * from the module's `load()` (via `registerWitlyWits`), which runs during
+     * app bootstrap, ahead of client start and the first `/sync`. In that case
+     * `accountData.get()` throws (no client). We must NOT mark the store
+     * hydrated in that situation, or the `if (this.hydrated) return` guard would
+     * permanently pin it to an empty mix — even after the dialog later opens
+     * with a live, synced client. So `hydrated` is only set once the read +
+     * watch have actually attached; every subsequent `subscribe()`/`hydrate()`
+     * call retries until then.
+     */
     public hydrate(): void {
         if (this.hydrated) return;
-        this.hydrated = true;
         try {
             const api = getWitlyApi();
             const mix = api.client.accountData.get(WIT_MIX_EVENT_TYPE);
             const custom = api.client.accountData.get(CUSTOM_WITS_EVENT_TYPE);
+            const rooms = api.client.accountData.get(ROOM_SETTINGS_EVENT_TYPE);
             this.applyMix(mix.value);
             this.applyCustom(custom.value);
-            if (!this.watching) {
-                mix.watch((value: unknown) => {
-                    this.applyMix(value);
-                    this.emit();
-                });
-                custom.watch((value: unknown) => {
-                    this.applyCustom(value);
-                    this.emit();
-                });
-                this.watching = true;
-            }
+            this.applyRoomSettings(rooms.value);
+            // Watches recover the state if account data arrives via `/sync`
+            // after this (possibly empty) initial read — the `.watch()` fires on
+            // the client's `AccountData` event.
+            mix.watch((value: unknown) => {
+                this.applyMix(value);
+                this.emit();
+            });
+            custom.watch((value: unknown) => {
+                this.applyCustom(value);
+                this.emit();
+            });
+            rooms.watch((value: unknown) => {
+                this.applyRoomSettings(value);
+                this.emit();
+            });
+            this.hydrated = true; // only after a successful read + watch attach
+            this.emit();
         } catch (err) {
-            witlyLog.warn("witStore.hydrate failed; starting empty", err);
+            // Client not ready yet — stay unhydrated so a later call retries.
+            witlyLog.debug("witStore.hydrate deferred; client not ready yet", err);
         }
     }
 
@@ -126,6 +186,19 @@ class WitStore {
         const content = (value ?? {}) as CustomWitsContent;
         const list = Array.isArray(content.wits) ? content.wits : [];
         this.customWits = list.map(sanitizeCustomWit).filter((w): w is CustomWit => w !== null);
+    }
+
+    private applyRoomSettings(value: unknown): void {
+        const content = (value ?? {}) as RoomSettingsContent;
+        const rooms = content.rooms;
+        const out: Record<string, RoomOverride> = {};
+        if (rooms && typeof rooms === "object") {
+            for (const [roomId, raw] of Object.entries(rooms)) {
+                const sane = sanitizeRoomOverride(raw);
+                if (sane) out[roomId] = sane;
+            }
+        }
+        this.roomSettings = out;
     }
 
     public subscribe(listener: Listener): () => void {
@@ -148,8 +221,32 @@ class WitStore {
         return this.mixOrder.includes(witId);
     }
 
+    /** The max number of Wits allowed in the mix (admin-configured; see catalog). */
+    public getMaxMixSize(): number {
+        return this.maxMixSize;
+    }
+
+    /**
+     * Set the mix-size cap from the backend catalog (`max_wit_mix_size`).
+     * Ignores non-positive values so a bad catalog read can't lock the mix.
+     */
+    public setMaxMixSize(size: number): void {
+        if (Number.isFinite(size) && size > 0 && size !== this.maxMixSize) {
+            this.maxMixSize = Math.floor(size);
+            this.emit();
+        }
+    }
+
+    /** True when the global mix is at the configured cap. */
+    public isMixFull(): boolean {
+        return this.mixOrder.length >= this.maxMixSize;
+    }
+
     public async addToMix(witId: string): Promise<void> {
         if (this.mixOrder.includes(witId)) return;
+        if (this.mixOrder.length >= this.maxMixSize) {
+            throw new Error(`Your mix is full (max ${this.maxMixSize} Wits). Remove one to add another.`);
+        }
         this.mixOrder = [...this.mixOrder, witId];
         await this.persistMix();
     }
@@ -205,6 +302,68 @@ class WitStore {
             await api.client.accountData.set(CUSTOM_WITS_EVENT_TYPE, { wits: this.customWits });
         } catch (err) {
             witlyLog.warn("witStore.persistCustom failed", err);
+            throw err;
+        }
+    }
+
+    // ── Per-room overrides & timing ────────────────────────────────────────────
+
+    /**
+     * The effective mix for a room: its per-room override if set, else the
+     * global mix. Pass no roomId to get the global mix.
+     */
+    public getEffectiveMix(roomId?: string): string[] {
+        if (roomId) {
+            const override = this.roomSettings[roomId];
+            if (override?.mix) return [...override.mix];
+        }
+        return [...this.mixOrder];
+    }
+
+    /** True if the room has an explicit mix override (vs inheriting the global mix). */
+    public hasRoomMixOverride(roomId: string): boolean {
+        return this.roomSettings[roomId]?.mix !== undefined;
+    }
+
+    /** The effective timing mode for a room: its override if set, else the global default. */
+    public getTimingMode(roomId?: string): TimingMode {
+        if (roomId) {
+            const override = this.roomSettings[roomId];
+            if (override?.timing) return override.timing;
+        }
+        return this.globalTiming;
+    }
+
+    /** Set (or clear) a room's mix override. Pass null to inherit the global mix. */
+    public async setRoomMix(roomId: string, mix: string[] | null): Promise<void> {
+        const capped = mix ? mix.slice(0, this.maxMixSize) : null;
+        await this.updateRoomOverride(roomId, (o) => {
+            if (capped === null) delete o.mix;
+            else o.mix = capped;
+        });
+    }
+
+    /** Set a room's timing override. Pass null to inherit the global default. */
+    public async setRoomTiming(roomId: string, timing: TimingMode | null): Promise<void> {
+        await this.updateRoomOverride(roomId, (o) => {
+            if (timing === null) delete o.timing;
+            else o.timing = timing;
+        });
+    }
+
+    private async updateRoomOverride(roomId: string, mutate: (o: RoomOverride) => void): Promise<void> {
+        const next = { ...this.roomSettings };
+        const current: RoomOverride = { ...(next[roomId] ?? {}) };
+        mutate(current);
+        if (Object.keys(current).length === 0) delete next[roomId];
+        else next[roomId] = current;
+        this.roomSettings = next;
+        this.emit(); // optimistic local update
+        try {
+            const api = getWitlyApi();
+            await api.client.accountData.set(ROOM_SETTINGS_EVENT_TYPE, { rooms: this.roomSettings });
+        } catch (err) {
+            witlyLog.warn("witStore.updateRoomOverride failed", err);
             throw err;
         }
     }

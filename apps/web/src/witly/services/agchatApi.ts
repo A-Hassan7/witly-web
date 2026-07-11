@@ -304,8 +304,18 @@ export function openSuggestionsStream(
     return () => es.close();
 }
 
-export const getAiCatalog = (): Promise<{ prompts: AiCatalogEntry[]; features: string[]; media_caption_limit: number }> =>
-    request<{ prompts: AiCatalogEntry[]; features: string[]; media_caption_limit: number }>("/ai/catalog");
+export const getAiCatalog = (): Promise<{
+    prompts: AiCatalogEntry[];
+    features: string[];
+    media_caption_limit: number;
+    max_wit_mix_size: number;
+}> =>
+    request<{
+        prompts: AiCatalogEntry[];
+        features: string[];
+        media_caption_limit: number;
+        max_wit_mix_size: number;
+    }>("/ai/catalog");
 
 export const getAiCredits = (): Promise<AiCreditsResponse> => request<AiCreditsResponse>("/ai/credits");
 

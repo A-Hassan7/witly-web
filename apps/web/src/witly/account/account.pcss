@@ -1,0 +1,322 @@
+/*
+Copyright 2026 Witly
+SPDX-License-Identifier: AGPL-3.0-only
+Please see LICENSE files in the repository root for full details.
+*/
+
+/*
+ * account.pcss — styles for the Witly account section in User Settings (P6).
+ *
+ * Reads `--witly-*` (brand) and `--cpd-*` (Compound) tokens only; it never
+ * aliases `--cpd-*` at :root. Class names are `witly_Account*` scoped under
+ * `.witly_Account` so they can't collide with Element's own settings styles.
+ * A local `.witly_Btn` base is included so the tab renders correctly even if
+ * no other Witly stylesheet happens to be on the page.
+ */
+
+.witly_Account {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 640px;
+}
+
+.witly_Account_section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: var(--cpd-color-bg-canvas-default);
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    border-radius: var(--witly-radius-lg);
+    box-shadow: var(--witly-shadow-card);
+}
+
+.witly_Account_sectionHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.witly_Account_title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_Account_hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Account_error {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--cpd-color-text-critical-primary);
+}
+
+/* ---- Profile ---- */
+
+.witly_Account_profile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.witly_Account_avatarBtn {
+    position: relative;
+    flex: 0 0 auto;
+    width: 72px;
+    height: 72px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.witly_Account_avatarBtn:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.witly_Account_avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.witly_Account_avatar--empty {
+    background: var(--witly-accent-gradient);
+    color: var(--witly-on-accent);
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.witly_Account_avatarEdit {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 2px 0;
+    font-size: 0.7rem;
+    text-align: center;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.witly_Account_fileInput {
+    display: none;
+}
+
+.witly_Account_profileFields {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.witly_Account_label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Account_nameRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.witly_Account_input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: var(--cpd-color-text-primary);
+    background: var(--cpd-color-bg-canvas-default);
+    border: 1px solid var(--cpd-color-border-interactive-primary);
+    border-radius: var(--witly-radius-md);
+}
+
+.witly_Account_input:focus {
+    outline: none;
+    border-color: var(--witly-accent);
+}
+
+.witly_Account_readonly {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+}
+
+.witly_Account_readonlyRow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.witly_Account_readonlyRow dt {
+    font-size: 0.85rem;
+    color: var(--cpd-color-text-secondary);
+}
+
+.witly_Account_readonlyRow dd {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cpd-color-text-primary);
+    word-break: break-all;
+}
+
+.witly_Account_signout {
+    align-self: flex-start;
+    margin-top: 4px;
+}
+
+/* ---- Plan ---- */
+
+.witly_Account_plan {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.witly_Account_planInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.witly_Account_planName {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_Account_planHint {
+    font-size: 0.8rem;
+    color: var(--cpd-color-text-secondary);
+}
+
+/* ---- Credits ---- */
+
+.witly_Account_meter {
+    width: 100%;
+    height: 10px;
+    border-radius: var(--witly-radius-pill);
+    background: var(--cpd-color-bg-subtle-secondary);
+    overflow: hidden;
+}
+
+.witly_Account_meterFill {
+    height: 100%;
+    background: var(--witly-accent-gradient);
+    transition: width var(--witly-motion-base) var(--witly-ease-standard);
+}
+
+/* ---- Platforms ---- */
+
+.witly_Account_platforms {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.witly_Account_platform {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    border-radius: var(--witly-radius-md);
+}
+
+.witly_Account_platformName {
+    font-size: 0.9rem;
+    color: var(--cpd-color-text-primary);
+}
+
+.witly_Account_platformStatus {
+    font-size: 0.8rem;
+    color: var(--cpd-color-text-success-primary);
+}
+
+/* ---- Danger zone ---- */
+
+.witly_Account_danger {
+    border-color: var(--cpd-color-border-critical-subtle);
+}
+
+.witly_Account_confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.witly_Account_confirmActions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ---- Buttons (local base + variants) ---- */
+
+.witly_Account .witly_Btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--cpd-color-text-primary);
+    background: var(--cpd-color-bg-canvas-default);
+    border: 1px solid var(--cpd-color-border-interactive-primary);
+    border-radius: var(--witly-radius-md);
+    cursor: pointer;
+    transition:
+        background var(--witly-motion-fast) var(--witly-ease-standard),
+        box-shadow var(--witly-motion-fast) var(--witly-ease-standard);
+}
+
+.witly_Account .witly_Btn:not(:disabled):hover {
+    background: var(--cpd-color-bg-subtle-secondary);
+}
+
+.witly_Account .witly_Btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.witly_Account .witly_Btn--primary {
+    color: var(--witly-on-accent);
+    background: var(--witly-accent-gradient);
+    border-color: transparent;
+}
+
+.witly_Account .witly_Btn--primary:not(:disabled):hover {
+    box-shadow: var(--witly-glow-accent);
+}
+
+.witly_Account .witly_Btn--danger {
+    color: var(--cpd-color-text-critical-primary);
+    border-color: var(--cpd-color-border-critical-subtle);
+    background: transparent;
+}
+
+.witly_Account .witly_Btn--danger:not(:disabled):hover {
+    background: var(--cpd-color-bg-critical-subtle);
+}

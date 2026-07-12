@@ -7,6 +7,7 @@ Please see LICENSE files in the repository root for full details.
 */
 
 export enum UserTab {
+    Witly = "USER_WITLY_TAB", // WITLY SEAM
     Account = "USER_ACCOUNT_TAB",
     Appearance = "USER_APPEARANCE_TAB",
     Notifications = "USER_NOTIFICATIONS_TAB",

@@ -23,6 +23,7 @@ import LockIcon from "@vector-im/compound-design-tokens/assets/web/icons/lock";
 import LabsIcon from "@vector-im/compound-design-tokens/assets/web/icons/labs";
 import BlockIcon from "@vector-im/compound-design-tokens/assets/web/icons/block";
 import HelpIcon from "@vector-im/compound-design-tokens/assets/web/icons/help";
+import FavouriteIcon from "@vector-im/compound-design-tokens/assets/web/icons/favourite"; // WITLY SEAM
 import { ToastContext, useActiveToast } from "@element-hq/web-shared-components";
 
 import TabbedView, { Tab, useActiveTabWithDefault } from "../../structures/TabbedView";
@@ -48,6 +49,7 @@ import { SDKContext, type SdkContextClass } from "../../../contexts/SDKContext";
 import { useSettingValue } from "../../../hooks/useSettings";
 import { NoChange, useEventEmitterAsyncState, type AsyncStateCallbackResult } from "../../../hooks/useEventEmitter";
 import { EncryptionUserSettingsTab, type State } from "../settings/tabs/user/EncryptionUserSettingsTab";
+import WitlyUserSettingsTab from "../../../witly/account/WitlyUserSettingsTab"; // WITLY SEAM
 
 interface IProps {
     initialTabId?: UserTab;
@@ -66,6 +68,8 @@ function titleForTabID(tabId: UserTab): React.ReactNode {
         strong: (sub: string) => <span className="mx_UserSettingsDialog_title_strong">{sub}</span>,
     };
     switch (tabId) {
+        case UserTab.Witly: // WITLY SEAM
+            return "Witly";
         case UserTab.Account:
             return _t("settings|account|dialog_title", undefined, subs);
         case UserTab.SessionManager:
@@ -124,6 +128,16 @@ export default function UserSettingsDialog(props: IProps): JSX.Element {
 
     const getTabs = (): NonEmptyArray<Tab<UserTab>> => {
         const tabs: Tab<UserTab>[] = [];
+
+        // WITLY SEAM — Witly account section sits at the top of the settings list.
+        tabs.push(
+            new Tab(
+                UserTab.Witly,
+                "Witly" as TranslationKey,
+                <FavouriteIcon />,
+                <WitlyUserSettingsTab />,
+            ),
+        );
 
         tabs.push(
             new Tab(

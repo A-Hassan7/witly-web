@@ -24,7 +24,7 @@ import React, { type JSX } from "react";
 
 import { useRoomSuggestions } from "./useRoomSuggestions";
 import { insertSuggestionIntoComposer } from "../element/moduleApi";
-import { openSuggestionsPanel } from "../element/registerSuggestions";
+import { openWitlyPanel } from "../element/registerPanel";
 import { openWitLibraryDialog } from "../element/registerWits";
 import "./suggestions.pcss";
 
@@ -109,7 +109,7 @@ export function WitlyComposerSuggestions({ roomId }: WitlyComposerSuggestionsPro
                     <button
                         type="button"
                         className="witly_Btn witly_ComposerSuggestions_more"
-                        onClick={() => openSuggestionsPanel(roomId)}
+                        onClick={() => openWitlyPanel(roomId, "suggestions")}
                     >
                         More
                     </button>

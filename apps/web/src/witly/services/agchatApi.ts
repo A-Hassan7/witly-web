@@ -256,6 +256,27 @@ export const postSuggestions = (
     });
 
 /**
+ * Ask AI: send a free-form question grounded in recent room messages.
+ *
+ * Thin wrapper over {@link postSuggestions} for the `qa` handler. `messages`
+ * is the flattened room context ({ sender_id, is_own, body }[]); the caller
+ * trims it to the admin-configured `ask_context_depth`. Stream the answer with
+ * {@link openSuggestionsStream} using the returned `stream_key`.
+ */
+export const postAsk = (
+    question: string,
+    messages: Array<{ sender_id: string; is_own: boolean; body: string }>,
+    roomId?: string,
+    roomContext?: string,
+): Promise<SuggestionsResponse> =>
+    postSuggestions(
+        "qa",
+        { question, messages, room_context: roomContext ?? "" },
+        undefined,
+        roomId,
+    );
+
+/**
  * Open an SSE connection for an AI stream. Returns a cleanup function that
  * closes the EventSource.
  *
@@ -309,12 +330,14 @@ export const getAiCatalog = (): Promise<{
     features: string[];
     media_caption_limit: number;
     max_wit_mix_size: number;
+    ask_context_depth: number;
 }> =>
     request<{
         prompts: AiCatalogEntry[];
         features: string[];
         media_caption_limit: number;
         max_wit_mix_size: number;
+        ask_context_depth: number;
     }>("/ai/catalog");
 
 export const getAiCredits = (): Promise<AiCreditsResponse> => request<AiCreditsResponse>("/ai/credits");

@@ -1,0 +1,227 @@
+/*
+Copyright 2026 Witly
+SPDX-License-Identifier: AGPL-3.0-only
+Please see LICENSE files in the repository root for full details.
+*/
+
+/*
+ * WitlyPanel — the full tabbed panel shell and its tab bodies.
+ *
+ * Centered-modal layout today. A later bottom-sheet refactor should only need
+ * to change the outer container (dock to bottom, use `--witly-z-sheet` /
+ * `--witly-shadow-sheet`) — the tab bar + bodies below are layout-agnostic.
+ */
+
+.witly_Panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(560px, 92vw);
+    max-height: 78vh;
+    min-height: 0;
+}
+
+.witly_Panel_tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--cpd-color-border-interactive-secondary);
+    flex: 0 0 auto;
+}
+
+.witly_Panel_tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 0;
+    background: transparent;
+    color: var(--cpd-color-text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.witly_Panel_tab--on {
+    color: var(--witly-accent);
+    border-bottom-color: var(--witly-accent);
+}
+
+.witly_Panel_body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.witly_Panel_error {
+    color: var(--cpd-color-text-critical-primary);
+    font-size: 0.9375rem;
+    padding: 16px;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .witly_Panel_tabLabel {
+        display: none;
+    }
+}
+
+/* ── SuggestionsTab per-chat mix ─────────────────────────────────────────── */
+
+.witly_SgTab {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.witly_SgTab_mix {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--cpd-color-bg-subtle-secondary);
+}
+
+.witly_SgTab_mixHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.witly_SgTab_mixTitle {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.witly_SgTab_mixActions {
+    display: flex;
+    gap: 10px;
+}
+
+.witly_SgTab_link {
+    border: 0;
+    background: transparent;
+    color: var(--witly-accent);
+    font-size: 0.8125rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.witly_SgTab_mixEmpty {
+    color: var(--cpd-color-text-secondary);
+    font-size: 0.8125rem;
+    margin: 0;
+}
+
+.witly_SgTab_chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.witly_SgTab_chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 10px;
+    border-radius: 999px;
+    background: var(--cpd-color-bg-canvas-default);
+    font-size: 0.8125rem;
+}
+
+.witly_SgTab_chipName {
+    max-width: 14ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.witly_SgTab_chipX {
+    border: 0;
+    background: transparent;
+    color: var(--cpd-color-text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 2px;
+}
+
+.witly_SgTab_newWit {
+    align-self: flex-start;
+    font-size: 0.8125rem;
+}
+
+/* ── SettingsTab ─────────────────────────────────────────────────────────── */
+
+.witly_Settings {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.witly_Settings_section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.witly_Settings_title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.witly_Settings_hint {
+    color: var(--cpd-color-text-secondary);
+    font-size: 0.8125rem;
+    margin: 0;
+}
+
+.witly_Settings_choices {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.witly_Settings_choice {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    flex: 1 1 180px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    text-align: left;
+    cursor: pointer;
+}
+
+.witly_Settings_choice--on {
+    border-color: var(--witly-accent);
+    background: var(--witly-accent-subtle);
+}
+
+.witly_Settings_choiceName {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.witly_Settings_choiceDesc {
+    color: var(--cpd-color-text-secondary);
+    font-size: 0.75rem;
+}
+
+.witly_Settings_reset {
+    align-self: flex-start;
+    border: 0;
+    background: transparent;
+    color: var(--witly-accent);
+    font-size: 0.8125rem;
+    cursor: pointer;
+    padding: 0;
+}

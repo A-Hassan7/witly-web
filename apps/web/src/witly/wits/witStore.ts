@@ -42,6 +42,9 @@ export const DEFAULT_TIMING_MODE: TimingMode = "manual";
 /** Fallback mix-size cap used until the backend catalog value is loaded. */
 export const DEFAULT_MAX_MIX_SIZE = 8;
 
+/** Fallback Ask AI context depth used until the backend catalog value is loaded. */
+export const DEFAULT_ASK_CONTEXT_DEPTH = 100;
+
 /** Per-room override of the global mix and/or timing. Absent fields inherit. */
 export interface RoomOverride {
     /** Ordered wit_ids active in this room. If unset, the global mix applies. */
@@ -127,6 +130,7 @@ class WitStore {
     private customWits: CustomWit[] = [];
     private roomSettings: Record<string, RoomOverride> = {};
     private maxMixSize = DEFAULT_MAX_MIX_SIZE;
+    private askContextDepth = DEFAULT_ASK_CONTEXT_DEPTH;
     private globalTiming: TimingMode = DEFAULT_TIMING_MODE;
     private hydrated = false;
     private readonly listeners = new Set<Listener>();
@@ -233,6 +237,19 @@ class WitStore {
     public setMaxMixSize(size: number): void {
         if (Number.isFinite(size) && size > 0 && size !== this.maxMixSize) {
             this.maxMixSize = Math.floor(size);
+            this.emit();
+        }
+    }
+
+    /** How many recent room messages Ask AI sends as context (admin-configured). */
+    public getAskContextDepth(): number {
+        return this.askContextDepth;
+    }
+
+    /** Set the Ask AI context depth from the backend catalog (`ask_context_depth`). */
+    public setAskContextDepth(depth: number): void {
+        if (Number.isFinite(depth) && depth > 0 && depth !== this.askContextDepth) {
+            this.askContextDepth = Math.floor(depth);
             this.emit();
         }
     }

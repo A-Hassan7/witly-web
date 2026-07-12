@@ -9,6 +9,7 @@ import { type Room } from "matrix-js-sdk/src/matrix";
 
 import { isLocalRoom } from "../../utils/localRoom/isLocalRoom";
 import { RoomListCustomisations } from "../../customisations/RoomList";
+import { isWitlyAskRoom } from "../../witly/element/roomVisibility"; // WITLY SEAM
 
 /**
  * Determines whether a room should be visible in the room list
@@ -22,6 +23,9 @@ export function isRoomVisible(room?: Room): boolean {
 
     // local rooms shouldn't show up anywhere
     if (isLocalRoom(room)) return false;
+
+    // WITLY SEAM: hide Ask AI history rooms (tagged witly.ask_ai) from the chat list.
+    if (isWitlyAskRoom(room)) return false;
 
     if (RoomListCustomisations.isRoomVisible) return RoomListCustomisations.isRoomVisible(room);
 
